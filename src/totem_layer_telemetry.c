@@ -14,39 +14,31 @@
 LOG_MODULE_REGISTER(totem_layer_telemetry, CONFIG_TOTEM_LAYER_TELEMETRY_LOG_LEVEL);
 
 static bool last_layer_valid;
-static zmk_keymap_layer_index_t last_active_index;
-static zmk_keymap_layer_id_t last_active_id;
-static zmk_keymap_layers_state_t last_state;
-static zmk_keymap_layers_state_t last_locks;
+static uint8_t last_layer;
 
 static void totem_layer_telemetry_emit(bool force) {
-    zmk_keymap_layer_index_t active_index = zmk_keymap_highest_layer_active();
-    zmk_keymap_layer_id_t active_id = zmk_keymap_layer_index_to_id(active_index);
-    zmk_keymap_layers_state_t state = zmk_keymap_layer_state();
-    zmk_keymap_layers_state_t locks = zmk_keymap_layer_locks();
-    const char *name = zmk_keymap_layer_name(active_id);
+    /* Portable across ZMK versions: only use the stable highest-layer API.
+     * For a linear keymap (no layer reordering) the index equals the id, and
+     * the host app uses this number to pick the layer image/bounds.
+     * state/locks are not used by the host app, so emit 0. */
+    uint8_t layer = (uint8_t)zmk_keymap_highest_layer_active();
+    const char *name = zmk_keymap_layer_name(layer);
 
-    if (!force && last_layer_valid && active_index == last_active_index &&
-        active_id == last_active_id && state == last_state && locks == last_locks) {
+    if (!force && last_layer_valid && layer == last_layer) {
         return;
     }
 
     last_layer_valid = true;
-    last_active_index = active_index;
-    last_active_id = active_id;
-    last_state = state;
-    last_locks = locks;
+    last_layer = layer;
 
     if (name == NULL || name[0] == '\0') {
         name = "unnamed";
     }
 
     printk("TOTEM_LAYER active=%u id=%u name=%s state=0x%08x locks=0x%08x\n",
-           (unsigned int)active_index, (unsigned int)active_id, name,
-           (uint32_t)state, (uint32_t)locks);
+           (unsigned int)layer, (unsigned int)layer, name, (uint32_t)0, (uint32_t)0);
     LOG_INF("TOTEM_LAYER active=%u id=%u name=%s state=0x%08x locks=0x%08x",
-            (unsigned int)active_index, (unsigned int)active_id, name,
-            (uint32_t)state, (uint32_t)locks);
+            (unsigned int)layer, (unsigned int)layer, name, (uint32_t)0, (uint32_t)0);
 }
 
 static void totem_layer_telemetry_boot_work_handler(struct k_work *work);
