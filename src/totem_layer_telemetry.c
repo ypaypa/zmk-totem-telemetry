@@ -87,4 +87,4 @@ static int totem_layer_telemetry_init(void) {
     return 0;
 }
 
-SYS_INIT(totem_layer_telemetry_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
+SYS_INIT(totem_layer_telemetry_init, APPLICATION, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
