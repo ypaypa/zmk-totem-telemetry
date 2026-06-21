@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: MIT
+
+menuconfig TOTEM_LAYER_TELEMETRY
+    bool "TOTEM Guide layer telemetry"
+    depends on !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+    help
+      Emits the current ZMK layer state to the Zephyr log stream whenever
+      the active layer changes. Enable USB logging to expose this stream to
+      the Windows companion app as a COM port.
+
+if TOTEM_LAYER_TELEMETRY
+
+config TOTEM_LAYER_TELEMETRY_BOOT_DELAY_MS
+    int "Initial layer telemetry delay"
+    default 1500
+    help
+      Delay before the first layer state line is emitted after boot.
+
+config TOTEM_LAYER_TELEMETRY_POLL_INTERVAL_MS
+    int "Layer state polling interval"
+    default 50
+    help
+      Polls ZMK's layer state at this interval and emits telemetry whenever
+      the state changes. This catches hold-tap layer changes even if an event
+      notification is missed.
+
+config TOTEM_LAYER_TELEMETRY_LOG_LEVEL
+    int "TOTEM Guide telemetry log level"
+    default 3
+    help
+      Zephyr log level for the telemetry module. 3 is info.
+
+endif

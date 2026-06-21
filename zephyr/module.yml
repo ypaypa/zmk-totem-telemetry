@@ -1,0 +1,4 @@
+name: totem-layer-telemetry
+build:
+  cmake: .
+  kconfig: Kconfig
